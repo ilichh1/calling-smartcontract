@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Calling Smart Contract Functions</title>
+</head>
+<body>
+
+  <main>
+    <h2>Calling smart contract function</h2>
+
+    <div class="container">
+      <button>Call function!</button>
+    </div>
+  </main>
+
+  <script src="web3.min.js"></script>
+  <script>
+
+    function runEthCode () {
+      // Use the current HTPP provider
+      web3 = new Web3(web3.currentProvider)
+
+      // Set the account we are going to use
+      web3.eth.defaultAccount = web3.eth.accounts[0]
+      var oscarContract = web3.eth.contract(
+        [
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_name",
+                "type": "string"
+              }
+            ],
+            "name": "setNombre",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "name",
+            "outputs": [
+              {
+                "name": "",
+                "type": "string"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [
+              {
+                "name": "_a",
+                "type": "uint256"
+              },
+              {
+                "name": "_b",
+                "type": "uint256"
+              }
+            ],
+            "name": "suma",
+            "outputs": [
+              {
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          }
+        ])
+        
+      var contractLocated = oscarContract.at('0x718b5A02Bd043300592e2cAE3D1dEE804CeDeB3c')
+
+      // The contract located
+      console.log(contractLocated)
+
+      // Testing functions
+      contractLocated.suma(5, 2, (err, res) => {
+        console.error(err)
+        console.log('==========')
+        console.log(res)
+      })
+
+      contractLocated.setNombre('Ilich!', (err, res) => {
+        console.log('Error: ')
+        console.error(err)
+        console.log('==========')
+        console.log('Result: ')
+        console.log(res)
+      })
+    }
+
+    // If web3 is present
+    if (typeof window.web3 !== 'undefined') {
+      web3.version.getNetwork((err, netId) => {
+        console.log(netId)
+        switch (netId) {
+          case "1":
+            console.log('This is mainnet')
+            break
+          case "2":
+            console.log('This is the deprecated Morden test network.')
+            break
+          case "3":
+            console.log('This is the ropsten test network.')
+            break
+          case "4":
+            // The smart contract is running on the rinkeby network
+            console.log('On the rinkeby network')
+            runEthCode()
+            break
+          default:
+            console.log('This is an unknown network.')
+        }
+      })
+    }
+
+  </script>
+
+</body>
+</html>
